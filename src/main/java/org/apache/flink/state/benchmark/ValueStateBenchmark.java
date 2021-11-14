@@ -79,59 +79,48 @@ public class ValueStateBenchmark extends StateBenchmarkBase {
 
     @Setup
     public void setUp() throws Exception {
-        // keyedStateBackend = createKeyedStateBackend(backendType);
 
-        // https://github.com/apache/flink/blob/39354f3bbf9e6d2a8fe0a5676dab3e1695249760/flink-state-backends/flink-statebackend-rocksdb/src/test/java/org/apache/flink/contrib/streaming/state/benchmark/StateBackendBenchmarkUtils.java
-        RedpandaStateBackend backend = new RedpandaStateBackend();
+        if(false){
+            keyedStateBackend = createKeyedStateBackend(backendType);
+        }
+        else{
+            // https://github.com/apache/flink/blob/39354f3bbf9e6d2a8fe0a5676dab3e1695249760/flink-state-backends/flink-statebackend-rocksdb/src/test/java/org/apache/flink/contrib/streaming/state/benchmark/StateBackendBenchmarkUtils.java
+            RedpandaStateBackend backend = new RedpandaStateBackend();
 
-        /*
-        createKeyedStateBackend(
-            Environment env,
-            JobID jobID,
-            String operatorIdentifier,
-            TypeSerializer<K> keySerializer,
-            int numberOfKeyGroups,
-            KeyGroupRange keyGroupRange,
-            TaskKvStateRegistry kvStateRegistry,
-            TtlTimeProvider ttlTimeProvider,
-            MetricGroup metricGroup,
-            @Nonnull Collection<KeyedStateHandle> stateHandles,
-            CloseableRegistry cancelStreamRegistry) 
-        */
-        File rootDir = prepareDirectory("benchmark", null);
-        File recoveryBaseDir = prepareDirectory("localRecovery", rootDir);
+            File rootDir = prepareDirectory("benchmark", null);
+            File recoveryBaseDir = prepareDirectory("localRecovery", rootDir);
 
-        ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-        KeyGroupRange keyGroupRange = new KeyGroupRange(0, 1);
-        int numberOfKeyGroups = keyGroupRange.getNumberOfKeyGroups();
-        MetricGroup metricGroup = new UnregisteredMetricsGroup();
+            ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+            KeyGroupRange keyGroupRange = new KeyGroupRange(0, 1);
+            int numberOfKeyGroups = keyGroupRange.getNumberOfKeyGroups();
+            MetricGroup metricGroup = new UnregisteredMetricsGroup();
 
-        ExecutionConfig executionConfig = new ExecutionConfig();
-        LocalRecoveryConfig localRecoveryConfig = new LocalRecoveryConfig(
-                                false,
-                                new LocalRecoveryDirectoryProviderImpl(
-                                        recoveryBaseDir, new JobID(), new JobVertexID(), 0));
-        
+            ExecutionConfig executionConfig = new ExecutionConfig();
+            LocalRecoveryConfig localRecoveryConfig = new LocalRecoveryConfig(
+                                    false,
+                                    new LocalRecoveryDirectoryProviderImpl(
+                                            recoveryBaseDir, new JobID(), new JobVertexID(), 0));
 
-        RedpandaKeyedStateBackendBuilder<Long> builder =
-                new RedpandaKeyedStateBackendBuilder<>(
-                        "Test",
-                        Thread.currentThread().getContextClassLoader(),
-                        null,
-                        LongSerializer.INSTANCE,
-                        numberOfKeyGroups,
-                        keyGroupRange,
-                        executionConfig,
-                        localRecoveryConfig,
-                        TtlTimeProvider.DEFAULT,
-                        LatencyTrackingStateConfig.disabled(),
-                        metricGroup,
-                        Collections.emptyList(),
-                        AbstractStateBackend.getCompressionDecorator(executionConfig),
-                        new CloseableRegistry());
+            RedpandaKeyedStateBackendBuilder<Long> builder =
+                    new RedpandaKeyedStateBackendBuilder<>(
+                            "Test",
+                            Thread.currentThread().getContextClassLoader(),
+                            null,
+                            LongSerializer.INSTANCE,
+                            numberOfKeyGroups,
+                            keyGroupRange,
+                            executionConfig,
+                            localRecoveryConfig,
+                            TtlTimeProvider.DEFAULT,
+                            LatencyTrackingStateConfig.disabled(),
+                            metricGroup,
+                            Collections.emptyList(),
+                            AbstractStateBackend.getCompressionDecorator(executionConfig),
+                            new CloseableRegistry());
 
-        RedpandaKeyedStateBackend<Long> keyedStateBackend_ = builder.build();
-        keyedStateBackend = keyedStateBackend_;
+            RedpandaKeyedStateBackend<Long> keyedStateBackend_ = builder.build();
+            keyedStateBackend = keyedStateBackend_;
+        }
 
         //----------------
         valueState =
