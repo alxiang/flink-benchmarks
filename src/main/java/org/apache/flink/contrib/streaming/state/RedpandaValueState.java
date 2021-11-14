@@ -257,12 +257,12 @@ class RedpandaValueState<K, N, V> extends AbstractRedpandaState<K, N, V>
 
             // // persist to Redpanda
             System.out.println("UPDATING VALUE (WRITING THROUGH TO REDPANDA)");
-            System.out.printf("key: %s, value: %s\n", (String) backend.getCurrentKey(), String.valueOf(value));
+            System.out.printf("key: %s, value: %s\n", String.valueOf(backend.getCurrentKey()), String.valueOf(value));
 
             // currently topic is hard-coded to word_chat since that is what the consumer is subscribed to
             // This could possibly changed to the state decriptor name for the value state idk
             // this.writeMessage(namespaceKeyStateNameTuple.f1, value);
-            this.writeMessage("word_chat", (String) backend.getCurrentKey(), (V) String.valueOf(value));
+            this.writeMessage("word_chat", String.valueOf(backend.getCurrentKey()), (V) String.valueOf(value));
         } catch (java.lang.Exception e) {
             throw new FlinkRuntimeException("Error while adding data to Memory Mapped File", e);
         }
