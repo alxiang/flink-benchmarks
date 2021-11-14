@@ -82,6 +82,8 @@ public class ValueStateBenchmark extends StateBenchmarkBase {
 
         if(false){
             keyedStateBackend = createKeyedStateBackend(backendType);
+            valueState =
+                getValueState(keyedStateBackend, new ValueStateDescriptor<>("kvState", Long.class));
         }
         else{
             // https://github.com/apache/flink/blob/39354f3bbf9e6d2a8fe0a5676dab3e1695249760/flink-state-backends/flink-statebackend-rocksdb/src/test/java/org/apache/flink/contrib/streaming/state/benchmark/StateBackendBenchmarkUtils.java
@@ -120,11 +122,13 @@ public class ValueStateBenchmark extends StateBenchmarkBase {
 
             RedpandaKeyedStateBackend<Long> keyedStateBackend_ = builder.build();
             keyedStateBackend = keyedStateBackend_;
+
+            valueState =
+                getValueState(keyedStateBackend, new ValueStateDescriptor<>("Word counter", Long.class));
         }
 
         //----------------
-        valueState =
-                getValueState(keyedStateBackend, new ValueStateDescriptor<>("kvState", Long.class));
+        
         for (int i = 0; i < setupKeyCount; ++i) {
             keyedStateBackend.setCurrentKey((long) i);
             valueState.update(random.nextLong());
