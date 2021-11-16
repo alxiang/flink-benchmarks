@@ -42,6 +42,10 @@ import org.apache.flink.contrib.streaming.state.RedpandaStateBackend;
 import org.apache.flink.contrib.streaming.state.RedpandaKeyedStateBackend;
 import org.apache.flink.contrib.streaming.state.RedpandaKeyedStateBackendBuilder;
 
+import org.apache.flink.contrib.streaming.state.MemoryMappedStateBackend;
+import org.apache.flink.contrib.streaming.state.MemoryMappedKeyedStateBackend;
+import org.apache.flink.contrib.streaming.state.MemoryMappedKeyedStateBackendBuilder;
+
 import org.apache.flink.runtime.state.ttl.TtlTimeProvider;
 import org.apache.flink.api.common.typeutils.base.LongSerializer;
 import org.apache.flink.api.common.JobID;
@@ -91,7 +95,7 @@ public class ValueStateBenchmark extends StateBenchmarkBase {
             valueState =
                 getValueState(keyedStateBackend, new ValueStateDescriptor<>("kvState", Long.class));
         }
-        else{
+        else if (backendType.equals("REDPANDA")){
             // https://github.com/apache/flink/blob/39354f3bbf9e6d2a8fe0a5676dab3e1695249760/flink-state-backends/flink-statebackend-rocksdb/src/test/java/org/apache/flink/contrib/streaming/state/benchmark/StateBackendBenchmarkUtils.java
             RedpandaStateBackend backend = new RedpandaStateBackend();
 
@@ -132,6 +136,47 @@ public class ValueStateBenchmark extends StateBenchmarkBase {
             valueState =
                 getValueState(keyedStateBackend, new ValueStateDescriptor<>("Word counter", Long.class));
         }
+        else if (backendType.equals("MEMORYMAPPED")){
+
+            MemoryMappedStateBackend backend = new MemoryMappedStateBackend();
+
+            File rootDir = prepareDirectory("benchmark", null);
+            File recoveryBaseDir = prepareDirectory("localRecovery", rootDir);
+
+            ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+            KeyGroupRange keyGroupRange = new KeyGroupRange(0, 1);
+            int numberOfKeyGroups = keyGroupRange.getNumberOfKeyGroups();
+            MetricGroup metricGroup = new UnregisteredMetricsGroup();
+
+            ExecutionConfig executionConfig = new ExecutionConfig();
+            LocalRecoveryConfig localRecoveryConfig = new LocalRecoveryConfig(
+                                    false,
+                                    new LocalRecoveryDirectoryProviderImpl(
+                                            recoveryBaseDir, new JobID(), new JobVertexID(), 0));
+
+            MemoryMappedKeyedStateBackendBuilder<Long> builder =
+                    new MemoryMappedKeyedStateBackendBuilder<>(
+                            "Test",
+                            Thread.currentThread().getContextClassLoader(),
+                            null,
+                            LongSerializer.INSTANCE,
+                            numberOfKeyGroups,
+                            keyGroupRange,
+                            executionConfig,
+                            localRecoveryConfig,
+                            TtlTimeProvider.DEFAULT,
+                            LatencyTrackingStateConfig.disabled(),
+                            metricGroup,
+                            Collections.emptyList(),
+                            AbstractStateBackend.getCompressionDecorator(executionConfig),
+                            new CloseableRegistry());
+
+            MemoryMappedKeyedStateBackend<Long> keyedStateBackend_ = builder.build();
+            keyedStateBackend = keyedStateBackend_;
+
+            valueState =
+                getValueState(keyedStateBackend, new ValueStateDescriptor<>("Word counter", Long.class));
+        }
 
         //----------------
         
@@ -142,22 +187,29 @@ public class ValueStateBenchmark extends StateBenchmarkBase {
         keyIndex = new AtomicInteger();
     }
 
-    @Benchmark
+    // @Benchmark
     public void valueUpdate(KeyValue keyValue) throws IOException {
         keyedStateBackend.setCurrentKey(keyValue.setUpKey);
         valueState.update(keyValue.value);
     }
 
-    @Benchmark
-    public void valueAdd(KeyValue keyValue) throws IOException {
-        keyedStateBackend.setCurrentKey(keyValue.newKey);
-        valueState.update(keyValue.value);
-    }
+    // @Benchmark
+    // public void valueAdd(KeyValue keyValue) throws IOException {
+    //     keyedStateBackend.setCurrentKey(keyValue.newKey);
+    //     valueState.update(keyValue.value);
+    // }
 
-    @Benchmark
+    // @Benchmark
     public Long valueGet(KeyValue keyValue) throws IOException {
         keyedStateBackend.setCurrentKey(keyValue.setUpKey);
         return valueState.value();
+    }
+
+    @Benchmark
+    public void valueGetAndUpdate(KeyValue keyValue) throws IOException {
+        keyedStateBackend.setCurrentKey(keyValue.setUpKey);
+        valueState.value();
+        valueState.update(keyValue.value);
     }
 
     // from here (private method): org.apache.flink.contrib.streaming.state.benchmark.StateBackendBenchmarkUtils.prepareDirectory; 
