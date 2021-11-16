@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.apache.flink.contrib.streaming.state.benchmark.StateBackendBenchmarkUtils.createKeyedStateBackend;
 import static org.apache.flink.contrib.streaming.state.benchmark.StateBackendBenchmarkUtils.getValueState;
 import static org.apache.flink.state.benchmark.StateBenchmarkConstants.setupKeyCount;
+import org.apache.flink.contrib.streaming.state.benchmark.StateBackendBenchmarkUtils;
 
 // my imports
 import org.apache.flink.contrib.streaming.state.RedpandaStateBackend;
@@ -80,8 +81,13 @@ public class ValueStateBenchmark extends StateBenchmarkBase {
     @Setup
     public void setUp() throws Exception {
 
-        if(false){
-            keyedStateBackend = createKeyedStateBackend(backendType);
+        if(backendType.equals("HEAP")){
+            keyedStateBackend = createKeyedStateBackend(StateBackendBenchmarkUtils.StateBackendType.HEAP);
+            valueState =
+                getValueState(keyedStateBackend, new ValueStateDescriptor<>("kvState", Long.class));
+        }
+        else if (backendType.equals("ROCKSDB")){
+            keyedStateBackend = createKeyedStateBackend(StateBackendBenchmarkUtils.StateBackendType.ROCKSDB);
             valueState =
                 getValueState(keyedStateBackend, new ValueStateDescriptor<>("kvState", Long.class));
         }

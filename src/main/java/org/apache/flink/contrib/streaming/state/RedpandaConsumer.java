@@ -63,8 +63,8 @@ public class RedpandaConsumer<K, V, N> extends Thread{
     
 
     // For latency testing:
-    // keep track of total latency over 100,000,000 records 
-    Integer num_records = 1000000;
+    // keep track of total latency over 500,000 records
+    Integer num_records = 500_000;
     Integer curr_records = 0;
 
     // currentTimeMillis - record.timestamp()
@@ -110,13 +110,13 @@ public class RedpandaConsumer<K, V, N> extends Thread{
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 
-        // props.put("session.timeout.ms", 30000);
-        // props.put("max.poll.interval.ms", 43200000);
-        // props.put("request.timeout.ms", 43205000);
+        props.put("session.timeout.ms", 30000);
+        props.put("max.poll.interval.ms", 43200000);
+        props.put("request.timeout.ms", 43205000);
 
         // performance configs
-        // props.put("fetch.min.bytes", 100000000);
-        // props.put("max.poll.records", 10000);
+        props.put("fetch.min.bytes", 100000000);
+        props.put("max.poll.records", 10000);
 
         // Create the consumer using props.
         final Consumer<String, String> consumer = new KafkaConsumer<>(props);
@@ -240,19 +240,19 @@ public class RedpandaConsumer<K, V, N> extends Thread{
                 curr_records += 1;
             }
 
-            // if((curr_records % 1000 == 0) && (curr_records < num_records)){
-            //     System.out.println("===LATENCY TESTING RESULTS===");
-            //     System.out.printf("Total Latency (from Producer): %f\n", 
-            //         (float) total_latency_from_produced);
-            //     // System.out.printf("Total Latency (from WordSource): %f\n",
-            //     //     (float) total_latency_from_source);
-            //     System.out.printf("Average Latency (from Producer): %f\n", 
-            //         (float) total_latency_from_produced / curr_records);
-            //     // System.out.printf("Average Latency (from WordSource): %f\n",
-            //     //     (float) total_latency_from_source / curr_records);
-            //     System.out.printf("Records processed: %d\n", curr_records);
-            // }
-            // System.out.printf("updated state for %s to %d from %d\n", word_key, state.value(), curr);
+            if((curr_records % 100_000 == 0) && (curr_records < num_records)){
+                System.out.println("===LATENCY TESTING RESULTS===");
+                System.out.printf("Total Latency (from Producer): %f\n", 
+                    (float) total_latency_from_produced);
+                // System.out.printf("Total Latency (from WordSource): %f\n",
+                //     (float) total_latency_from_source);
+                System.out.printf("Average Latency (from Producer): %f\n", 
+                    (float) total_latency_from_produced / curr_records);
+                // System.out.printf("Average Latency (from WordSource): %f\n",
+                //     (float) total_latency_from_source / curr_records);
+                System.out.printf("Records processed: %d\n", curr_records);
+            }
+            // System.out.printf("updated state for %s to %d\n", word_key, value);
         }
         catch (Exception exception){
             System.out.println("Exception in processRecord(): " + exception);
@@ -326,7 +326,7 @@ public class RedpandaConsumer<K, V, N> extends Thread{
             // System.out.println("[REDPANDACONSUMER] I am polling!");
             if (consumerRecords.count() != 0) {
 
-                // System.out.println("Num consumer records " + consumerRecords.count());
+                System.out.println("Num consumer records " + consumerRecords.count());
 
                 consumerRecords.forEach(record -> processRecord(record));
                 consumer.commitAsync();
