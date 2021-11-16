@@ -166,7 +166,7 @@ class RedpandaValueState<K, N, V> extends AbstractRedpandaState<K, N, V>
     public V value() {
 
         // call the poll every 10000 calls to value()
-        if(i % 250000 == 0){
+        if(i % 10000 == 0){
             this.thread.run();
             i = 0;
         }

@@ -187,7 +187,20 @@ public class ValueStateBenchmark extends StateBenchmarkBase {
         keyIndex = new AtomicInteger();
     }
 
-    // @Benchmark
+    @Benchmark
+    public void valueGetAndUpdate(KeyValue keyValue) throws IOException {
+        keyedStateBackend.setCurrentKey(keyValue.setUpKey);
+        valueState.value();
+        valueState.update(keyValue.value);
+    }
+
+    @Benchmark
+    public Long valueGet(KeyValue keyValue) throws IOException {
+        keyedStateBackend.setCurrentKey(keyValue.setUpKey);
+        return valueState.value();
+    }
+
+    @Benchmark
     public void valueUpdate(KeyValue keyValue) throws IOException {
         keyedStateBackend.setCurrentKey(keyValue.setUpKey);
         valueState.update(keyValue.value);
@@ -197,20 +210,7 @@ public class ValueStateBenchmark extends StateBenchmarkBase {
     // public void valueAdd(KeyValue keyValue) throws IOException {
     //     keyedStateBackend.setCurrentKey(keyValue.newKey);
     //     valueState.update(keyValue.value);
-    // }
-
-    // @Benchmark
-    public Long valueGet(KeyValue keyValue) throws IOException {
-        keyedStateBackend.setCurrentKey(keyValue.setUpKey);
-        return valueState.value();
-    }
-
-    @Benchmark
-    public void valueGetAndUpdate(KeyValue keyValue) throws IOException {
-        keyedStateBackend.setCurrentKey(keyValue.setUpKey);
-        valueState.value();
-        valueState.update(keyValue.value);
-    }
+    // }    
 
     // from here (private method): org.apache.flink.contrib.streaming.state.benchmark.StateBackendBenchmarkUtils.prepareDirectory; 
     static File prepareDirectory(String prefix, File parentDir) throws IOException {
