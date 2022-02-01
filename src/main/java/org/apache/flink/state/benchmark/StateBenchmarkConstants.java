@@ -30,7 +30,7 @@ class StateBenchmarkConstants {
     // TODO: why all of those static fields? Those should be inside a context class
     static final int mapKeyCount = 10;
     static final int listValueCount = 100;
-    static final int setupKeyCount = 500_000;
+    static final int setupKeyCount = 100;//100_000;//500_000;
     static final String rootDirName = "benchmark";
     static final String recoveryDirName = "localRecovery";
     static final String dbDirName = "dbPath";
@@ -38,7 +38,7 @@ class StateBenchmarkConstants {
     static final ArrayList<Long> mapKeys = new ArrayList<>(mapKeyCount);
     static final ArrayList<Double> mapValues = new ArrayList<>(mapKeyCount);
     static final ArrayList<Long> setupKeys = new ArrayList<>(setupKeyCount);
-    static final int newKeyCount = 500_000;
+    static final int newKeyCount = 100;//500_000;
     static final ArrayList<Long> newKeys = new ArrayList<>(newKeyCount);
     static final int randomValueCount = 1_000_000;
     static final ArrayList<Long> randomValues = new ArrayList<>(randomValueCount);

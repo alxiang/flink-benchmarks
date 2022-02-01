@@ -1,0 +1,11 @@
+\begin{tabular}{l@{\hskip 12pt}S[table-format = 2.2]S[table-format = 2.2]S[table-format = 2.2]S[table-format = 2.2]}
+\toprule
+                                         Benchmark &   Mode &  Threads &  Samples &        Score &  Score Error (99.9%) &    Unit & Param: backendType \\
+\midrule
+ org.apache.flink.state.benchmark.ValueStateBen... &  thrpt &        1 &       30 &  1773.789229 &            67.147089 &  ops/ms &           REDPANDA \\
+ org.apache.flink.state.benchmark.ValueStateBen... &  thrpt &        1 &       30 &  5198.764023 &           237.442297 &  ops/ms &               HEAP \\
+ org.apache.flink.state.benchmark.ValueStateBen... &  thrpt &        1 &       30 &   742.723057 &            52.128380 &  ops/ms &            ROCKSDB \\
+ org.apache.flink.state.benchmark.ValueStateBen... &  thrpt &        1 &       30 &     0.362245 &             0.016902 &  ops/ms &           REDPANDA \\
+ org.apache.flink.state.benchmark.ValueStateBen... &  thrpt &        1 &       30 &  4646.651020 &           164.480712 &  ops/ms &               HEAP \\
+\bottomrule
+\end{tabular}

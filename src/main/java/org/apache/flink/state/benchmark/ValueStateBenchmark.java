@@ -187,12 +187,12 @@ public class ValueStateBenchmark extends StateBenchmarkBase {
         keyIndex = new AtomicInteger();
     }
 
-    @Benchmark
-    public void valueGetAndUpdate(KeyValue keyValue) throws IOException {
-        keyedStateBackend.setCurrentKey(keyValue.setUpKey);
-        valueState.value();
-        valueState.update(keyValue.value);
-    }
+    // @Benchmark
+    // public void valueGetAndUpdate(KeyValue keyValue) throws IOException {
+    //     keyedStateBackend.setCurrentKey(keyValue.setUpKey);
+    //     valueState.value();
+    //     valueState.update(keyValue.value);
+    // }
 
     @Benchmark
     public Long valueGet(KeyValue keyValue) throws IOException {
